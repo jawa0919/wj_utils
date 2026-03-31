@@ -1,3 +1,4 @@
+export 'store/language_store.dart';
 export 'store/server_store.dart';
 export 'store/theme_store.dart';
 
@@ -10,6 +11,7 @@ export 'util/http_util.dart';
 export 'util/media_util.dart';
 
 export 'view/about_view.dart';
+export 'view/setting_view.dart';
 
 // icp备案号查询链接
 const String icpQueryUrl = 'https://beian.miit.gov.cn/';
