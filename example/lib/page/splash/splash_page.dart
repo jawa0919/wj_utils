@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../app_const.dart';
 import '../../app_import.dart';
 
 class SplashPage extends StatefulWidget {
@@ -17,16 +16,7 @@ class _SplashPageState extends State<SplashPage> {
   void _incrementCounter() {
     _counter++;
     setState(() {});
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SettingView(
-          appStoreId: AppConst.appStoreId,
-          icpNumber: AppConst.icpNumber,
-          copyrightCode: AppConst.copyrightCode,
-        ),
-      ),
-    );
+    DebugPage.start(context);
   }
 
   @override

@@ -8,12 +8,12 @@ class ServerStore {
   static ServerStore get instance => _instance;
   static ServerStore get to => _instance;
 
-  late List<Map<String, dynamic>> _list;
+  late List<Map<String, dynamic>> serverInfoList;
   static void init(List<Map<String, dynamic>> serverInfoList) =>
       _instance._internal(serverInfoList);
 
   void _internal(List<Map<String, dynamic>> serverInfoList) {
-    _list = serverInfoList;
+    this.serverInfoList = serverInfoList;
     debugPrint('server_store.dart~_internal: ');
     _serverEnv = GlobalUtil.pref.getString('_serverEnv') ?? 'prod';
     if (_serverEnv == 'custom') {
@@ -23,7 +23,9 @@ class ServerStore {
         'h5Host': GlobalUtil.pref.getString('custom_h5Host'),
       };
     } else {
-      _serverInfo = _list.firstWhere((element) => element['env'] == _serverEnv);
+      _serverInfo = this.serverInfoList.firstWhere(
+        (element) => element['env'] == _serverEnv,
+      );
     }
 
     checkUpdateEpoch = GlobalUtil.pref.getInt('checkUpdateEpoch') ?? 0;
