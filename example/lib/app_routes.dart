@@ -5,35 +5,26 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_import.dart';
-import 'page/splash/splash_page.dart';
 import 'page/login/login_page.dart';
 import 'page/home/home_page.dart';
 
 class AppRoutes {
   AppRoutes._();
   static final routerConfig = GoRouter(
-    initialLocation: SplashPage.routeName,
-    // initialLocation: MainPage.routeName,
-    // initialLocation: H5Page.routeName,
+    initialLocation: LoginPage.routeName,
     errorBuilder: (context, state) => RouteErrorPage(),
     routes: [
-      GoRoute(
-        path: SplashPage.routeName,
-        name: SplashPage.routeName,
-        builder: (context, state) => SplashPage(),
-      ),
       GoRoute(
         path: LoginPage.routeName,
         name: LoginPage.routeName,
         builder: (context, state) => LoginPage(),
-        // redirect: (context, state) {
-        //   if (UserStore.to.hasToken) {
-        //     UserStore.to.saveToken(UserStore.to.token);
-        //     // return MainPage.routeName;
-        //     return H5Page.routeName;
-        //   }
-        //   return null;
-        // },
+        redirect: (context, state) {
+          // if (UserStore.to.hasToken) {
+          //   UserStore.to.saveToken(UserStore.to.token);
+          //   return HomePage.routeName;
+          // }
+          return null;
+        },
       ),
       // GoRoute(
       //   path: RegisterPage.routeName,
@@ -44,6 +35,10 @@ class AppRoutes {
         path: HomePage.routeName,
         name: HomePage.routeName,
         builder: (context, state) => HomePage(),
+        redirect: (context, state) {
+          //   return H5Page.routeName;
+          return null;
+        },
       ),
       // GoRoute(
       //   path: ProfilePage.routeName,
@@ -102,7 +97,7 @@ class AppRoutes {
   }
 
   static void setPageLanguage() {
-    LanguageStore.to.addLanguageMap(SplashPageLanguage.languageMap);
+    LanguageStore.to.addLanguageMap(LoginPageLanguage.languageMap);
   }
 }
 

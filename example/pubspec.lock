@@ -416,6 +416,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.34"
+  flutter_scankit:
+    dependency: "direct main"
+    description:
+      name: flutter_scankit
+      sha256: bcccc62fb1441211db8df3ef971f432274e29269b8d16d017e8de8cc1d8ed21e
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.6"
   flutter_screenutil:
     dependency: "direct main"
     description:
@@ -652,14 +660,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.0"
-  mobile_scanner:
-    dependency: "direct main"
-    description:
-      name: mobile_scanner
-      sha256: c92c26bf2231695b6d3477c8dcf435f51e28f87b1745966b1fe4c47a286171ce
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "7.2.0"
   native_toolchain_c:
     dependency: transitive
     description:

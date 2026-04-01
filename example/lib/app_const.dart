@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class AppConst {
   AppConst._();
   // 适合手机的尺寸

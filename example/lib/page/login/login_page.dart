@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app_import.dart';
+
 class LoginPage extends StatefulWidget {
   static const String routeName = '/login';
   const LoginPage({super.key});
@@ -14,6 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   void _incrementCounter() {
     _counter++;
     setState(() {});
+    DebugPage.start(context);
   }
 
   @override
@@ -29,6 +32,7 @@ class _LoginPageState extends State<LoginPage> {
                 '$_counter',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
+              Text('LoginPage.您好'.tr),
               ...List.generate(100, (i) => Text(i.toString())),
               const Text('You have pushed the button this many times:'),
             ],
@@ -42,4 +46,13 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+}
+
+extension LoginPageLanguage on LoginPage {
+  static final languageMap = {
+    const Locale('zh', 'CN'): {'LoginPage.您好': '您好'},
+    const Locale('en', 'US'): {'LoginPage.您好': 'Hello'},
+    const Locale('ja', 'JP'): {'LoginPage.您好': 'こんにちは'},
+    const Locale('ko', 'KR'): {'LoginPage.您好': '안녕하세요'},
+  };
 }

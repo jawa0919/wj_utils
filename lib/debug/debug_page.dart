@@ -4,6 +4,7 @@ import 'package:dio_log_plus/dio_log_plus.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../util/global_util.dart';
+import '../view/qr_scan_view.dart';
 import '../view/setting_view.dart';
 import 'server_host_page.dart';
 import 'storage_show_page.dart';
@@ -103,7 +104,6 @@ class _DebugPageState extends State<DebugPage> {
                   );
                 },
               ),
-
               TextButton(
                 child: const Text('更换服务器'),
                 onPressed: () async {
@@ -141,8 +141,27 @@ class _DebugPageState extends State<DebugPage> {
                   );
                 },
               ),
+              TextButton(
+                child: const Text('二维码扫描'),
+                onPressed: () async {
+                  Navigator.of(context)
+                      .push(
+                        MaterialPageRoute(
+                          builder: (context) => const QrScanView(),
+                        ),
+                      )
+                      .then((value) {
+                        if (value != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('scanning result:value=$value'),
+                            ),
+                          );
+                        }
+                      });
+                },
+              ),
               TextButton(child: const Text('安全退出'), onPressed: () async {}),
-              TextButton(child: const Text('二维码扫描'), onPressed: () async {}),
               TextButton(child: const Text('消息推送'), onPressed: () async {}),
               TextButton(child: const Text('文件上传测试'), onPressed: () async {}),
               TextButton(child: const Text('文件下载测试'), onPressed: () async {}),

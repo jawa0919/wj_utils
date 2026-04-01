@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -29,13 +28,9 @@ class App extends StatelessWidget {
         darkTheme: ThemeStore.to.darkTheme.value,
         themeMode: ThemeStore.to.themeMode.watch(context),
 
+        localizationsDelegates: LanguageStore.to.localizationsDelegates,
         supportedLocales: LanguageStore.to.supportedLocales,
         locale: LanguageStore.to.locale.watch(context),
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
       ),
     );
   }
