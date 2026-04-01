@@ -22,7 +22,7 @@ void main() async {
 
 Future<void> _initSystem() async {
   ServerStore.init(AppConst.serverInfoList);
-  ThemeStore.init(AppConst.colorScheme);
+  ThemeStore.init(AppTheme.colorScheme);
   LanguageStore.init({});
   AppRoutes.setPageLanguage();
   if (!GlobalUtil.isWeb) {

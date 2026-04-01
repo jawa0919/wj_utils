@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:signals/signals_flutter.dart';
 
 import '../wj_utils.dart';
@@ -77,6 +78,11 @@ class LanguageStore {
     );
   }
 
+  final List<LocalizationsDelegate> localizationsDelegates = [
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ];
   final _languageIndex = signal(0);
   late final locale = computed(() => supportedLocales[_languageIndex.value]);
   late final isChinese = computed(
