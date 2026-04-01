@@ -1,12 +1,13 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+
 import 'package:go_router/go_router.dart';
 
-import '../app_import.dart';
-import '../page/splash/splash_page.dart';
-import '../page/login/login_page.dart';
-import '../page/home/home_page.dart';
-import 'route_error_page.dart';
+import 'app_import.dart';
+import 'page/splash/splash_page.dart';
+import 'page/login/login_page.dart';
+import 'page/home/home_page.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -45,24 +46,9 @@ class AppRoutes {
         builder: (context, state) => HomePage(),
       ),
       // GoRoute(
-      //   path: AboutPage.routeName,
-      //   name: AboutPage.routeName,
-      //   builder: (context, state) => AboutPage(),
-      // ),
-      // GoRoute(
-      //   path: DebugPage.routeName,
-      //   name: DebugPage.routeName,
-      //   builder: (context, state) => DebugPage(),
-      // ),
-      // GoRoute(
       //   path: ProfilePage.routeName,
       //   name: ProfilePage.routeName,
       //   builder: (context, state) => ProfilePage(),
-      // ),
-      // GoRoute(
-      //   path: SettingPage.routeName,
-      //   name: SettingPage.routeName,
-      //   builder: (context, state) => SettingPage(),
       // ),
       // GoRoute(
       //   path: H5Page.routeName,
@@ -117,6 +103,16 @@ class AppRoutes {
 
   static void setPageLanguage() {
     LanguageStore.to.addLanguageMap(SplashPageLanguage.languageMap);
+  }
+}
+
+class RouteErrorPage extends StatelessWidget {
+  const RouteErrorPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = GoRouterState.of(context);
+    return Scaffold(body: Center(child: Text(state.error.toString())));
   }
 }
 

@@ -6,9 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'app.dart';
-import 'app_const.dart';
 import 'app_import.dart';
-import 'route/app_routes.dart';
 
 void main() async {
   debugPrint('main.dart~running: isProduct-${GlobalUtil.isProduct}');

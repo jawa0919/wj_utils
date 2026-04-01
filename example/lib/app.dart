@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:signals/signals_flutter.dart';
 
-import 'app_const.dart';
 import 'app_import.dart';
-import 'route/app_routes.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
