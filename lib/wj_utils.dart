@@ -13,6 +13,7 @@ export 'util/media_util.dart';
 export 'view/about_view.dart';
 export 'view/setting_view.dart';
 export 'view/qr_scan_view.dart';
+export 'view/cache_image.dart';
 
 export 'debug/debug_page.dart';
 
