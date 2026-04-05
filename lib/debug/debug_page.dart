@@ -108,13 +108,7 @@ class _DebugPageState extends State<DebugPage> {
                 child: const Text('更换服务器'),
                 onPressed: () async {
                   Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => ServerHostPage(
-                        onServerChange: () {
-                          setState(() {});
-                        },
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (context) => ServerHostPage()),
                   );
                 },
               ),

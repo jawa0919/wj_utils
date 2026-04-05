@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:signals/signals_flutter.dart';
 
 import '../util/global_util.dart' show GlobalUtil;
 
@@ -15,8 +16,8 @@ class ServerStore {
   void _internal(List<Map<String, dynamic>> serverInfoList) {
     this.serverInfoList = serverInfoList;
     debugPrint('server_store.dart~_internal: ');
-    _serverEnv = GlobalUtil.pref.getString('_serverEnv') ?? 'prod';
-    if (_serverEnv == 'custom') {
+    _serverEnv.value = GlobalUtil.pref.getString('_serverEnv') ?? 'prod';
+    if (_serverEnv.value == 'custom') {
       _serverInfo = {
         'env': 'custom',
         'apiHost': GlobalUtil.pref.getString('custom_apiHost'),
@@ -24,7 +25,7 @@ class ServerStore {
       };
     } else {
       _serverInfo = this.serverInfoList.firstWhere(
-        (element) => element['env'] == _serverEnv,
+        (element) => element['env'] == _serverEnv.value,
       );
     }
 
@@ -32,7 +33,7 @@ class ServerStore {
   }
 
   /// 服务器信息
-  String _serverEnv = 'prod';
+  final _serverEnv = signal('prod');
   Map<String, dynamic> _serverInfo = {};
   String get env => _serverInfo['env']?.toString() ?? '';
   String get apiHost => _serverInfo['apiHost']?.toString() ?? '';
@@ -44,8 +45,8 @@ class ServerStore {
 
   Future<void> saveServerInfo(Map<String, dynamic> val) async {
     await GlobalUtil.pref.setString('_serverEnv', val['env']);
-    _serverEnv = val['env'];
     _serverInfo = val;
+    _serverEnv.value = val['env'];
     if (val['env'] == 'custom') {
       await GlobalUtil.pref.setString('custom_apiHost', val['apiHost']);
       await GlobalUtil.pref.setString('custom_h5Host', val['h5Host']);

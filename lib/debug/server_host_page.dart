@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import '../store/server_store.dart';
 
 class ServerHostPage extends StatelessWidget {
-  final void Function() onServerChange;
-  ServerHostPage({super.key, required this.onServerChange});
+  ServerHostPage({super.key});
 
   final apiHostCt = TextEditingController();
   final h5HostCt = TextEditingController();
@@ -44,7 +43,7 @@ class ServerHostPage extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         if (s['env'] == 'custom') {
-          showDialog(
+          await showDialog(
             context: context,
             builder: (context) => getCustomServerEditView(
               context,
@@ -77,14 +76,15 @@ class ServerHostPage extends StatelessWidget {
                   'apiHost': apiPath,
                   'h5Host': h5Path,
                 });
-                onServerChange();
+                Navigator.of(context).pop();
               },
             ),
           );
+          Navigator.of(context).pop();
           return;
         }
         await ServerStore.to.saveServerInfo(s);
-        onServerChange();
+        Navigator.of(context).pop();
       },
       child: SizedBox(
         width: 375,
