@@ -9,6 +9,7 @@ export 'util/ex_widget.dart';
 export 'util/global_util.dart';
 export 'util/http_util.dart';
 export 'util/media_util.dart';
+export 'util/crypto_util.dart';
 
 export 'view/about_view.dart';
 export 'view/setting_view.dart';
