@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app_import.dart';
+import '../home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   static const String routeName = '/login';
@@ -16,25 +17,35 @@ class _LoginPageState extends State<LoginPage> {
   void _incrementCounter() {
     _counter++;
     setState(() {});
-    DebugPage.start(context);
+  }
+
+  void _loginSuccess() {
+    AppRoutes.clearAllPush(HomePage.routeName);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.language),
+          onPressed: () => SettingView.showLanguageDialog(context),
+        ),
+      ),
+      extendBodyBehindAppBar: true,
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              ...List.generate(10, (i) => Text(i.toString())),
               const Text('You have pushed the button this many times:'),
               Text(
                 '$_counter',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
-              Text('LoginPage.您好'.tr),
+              SafeArea(child: Text('LoginPage.您好'.tr).onTap(_loginSuccess)),
               ...List.generate(100, (i) => Text(i.toString())),
-              const Text('You have pushed the button this many times:'),
             ],
           ),
         ),

@@ -40,7 +40,6 @@ class LanguageStore {
       const Locale('ja', 'JP'): {'language.name': '日本語'},
       const Locale('ko', 'KR'): {'language.name': '한국어'},
     };
-    addLanguageMap(AboutViewLanguage.languageMap);
     addLanguageMap(SettingViewLanguage.languageMap);
     addLanguageMap(languageMap);
     debugPrint('language_store.dart~_internal: ');

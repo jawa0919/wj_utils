@@ -111,20 +111,20 @@ class RouteErrorPage extends StatelessWidget {
   }
 }
 
-// class H5Routes {
-//   H5Routes._();
+class H5Routes {
+  H5Routes._();
 
-//   static Future<T?> push<T>(String url) {
-//     return AppRoutes.push(H5Page.routeName, {'url': url});
-//   }
+  // static Future<T?> push<T>(String url) {
+  //   return AppRoutes.push(H5Page.routeName, {'url': url});
+  // }
 
-//   /// 主页面
-//   static const String _home = '/';
-//   static String get home => H5Page.formateH5Url(_home);
+  // /// h5主页面
+  // static const String _home = '/';
+  // static String get home => H5Page.formateH5Url(_home);
 
-//   /// 订阅页面
-//   // static const String _subscriptions = '/subscriptions';
-//   // static get subscriptions => formateH5Url(_subscriptions);
-//   static String get subscriptions =>
-//       'https://developer.apple.com/cn/app-store/subscriptions/';
-// }
+  // /// h5订阅页面
+  // // static const String _subscriptions = '/subscriptions';
+  // // static get subscriptions => formateH5Url(_subscriptions);
+  // static String get subscriptions =>
+  //     'https://developer.apple.com/cn/app-store/subscriptions/';
+}

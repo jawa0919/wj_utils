@@ -4,3 +4,5 @@ export 'package:wj_utils/wj_utils.dart';
 export 'app_routes.dart';
 export 'app_const.dart';
 export 'app_theme.dart';
+
+export 'store/user_store.dart';
