@@ -10,6 +10,20 @@ class MediaUtil {
   MediaUtil._();
 
   /// 保存网络图片到相册
+  static Future<SaveResult> saveImageBytesToPhotosAlbum(
+    Uint8List imageBytes,
+    String fileName,
+  ) async {
+    final hasPermission = await _checkGalleryPermissions(false);
+    if (!hasPermission) return SaveResult(false, 'no permission');
+    return await SaverGallery.saveImage(
+      imageBytes,
+      fileName: fileName,
+      skipIfExists: false,
+    );
+  }
+
+  /// 保存网络图片到相册
   static Future<SaveResult> saveNetImageToPhotosAlbum(
     String url,
     String fileName, {

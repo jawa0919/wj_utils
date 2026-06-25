@@ -111,6 +111,10 @@ class _SettingViewState extends State<SettingView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
         title: Text('SettingView.设置'.tr).onTap(() {
           DebugPage.start(context);
         }),

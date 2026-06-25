@@ -1,11 +1,15 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import 'package:dio_log_plus/dio_log_plus.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+import '../h5/h5_page.dart';
+import '../util/ex_object.dart';
 import '../util/global_util.dart';
+import '../util/media_util.dart';
 import '../view/qr_scan_view.dart';
-import 'internal_browser.dart';
 import 'server_host_page.dart';
 import 'storage_show_page.dart';
 import 'theme_color_show_page.dart';
@@ -37,11 +41,18 @@ class _DebugPageState extends State<DebugPage> {
     super.dispose();
   }
 
+  var f = TextEditingController(text: 'https://flutter.cn/');
   @override
   Widget build(BuildContext context) {
     showDebugBtn(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('DebugPage')),
+      appBar: AppBar(
+        title: const Text('DebugPage'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+      ),
       extendBody: false,
       body: Card(
         margin: const EdgeInsets.all(16),
@@ -88,22 +99,82 @@ class _DebugPageState extends State<DebugPage> {
                   );
                 },
               ),
+              TextButton(
+                child: const Text('js bridge debug'),
+                onPressed: () async {
+                  final localhostServer = InAppLocalhostServer(
+                    port: 14399,
+                    documentRoot: 'packages/wj_utils/assets/js_bridge_debug/',
+                  );
+                  await localhostServer.start();
+                  String url = 'http://localhost:14399/index.html';
+                  Navigator.of(context)
+                      .push(
+                        MaterialPageRoute(
+                          builder: (context) => H5Page(url: url),
+                        ),
+                      )
+                      .then((_) {
+                        localhostServer.close();
+                      });
+                },
+              ),
               Builder(
                 builder: (context) {
-                  var f = TextEditingController(text: 'https://flutter.cn/');
                   return ListTile(
-                    title: Text('内置浏览器'),
+                    leading: IconButton(
+                      onPressed: () {
+                        GlobalUtil.openSystemBrowser(f.text);
+                      },
+                      onLongPress: () {
+                        final imgBytes = QrScanView.qrPng(f.text);
+                        showDialog(
+                          context: context,
+                          builder: (context) => LayoutBuilder(
+                            builder: (context, constraints) {
+                              final maxWidth = constraints.maxWidth;
+                              final maxHeight = constraints.maxHeight;
+                              final sideLength = math.min(
+                                math.min(maxWidth, maxHeight),
+                                math.max(maxWidth, maxHeight) / 2,
+                              );
+                              return SizedBox(
+                                width: sideLength,
+                                height: sideLength,
+                                child: InkWell(
+                                  onLongPressUp: () async {
+                                    await MediaUtil.saveImageBytesToPhotosAlbum(
+                                      imgBytes,
+                                      'qr_code_${DateTime.now().str}.png',
+                                    ).then((value) {
+                                      if (value.isSuccess) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text('save success'),
+                                          ),
+                                        );
+                                      }
+                                    });
+                                  },
+                                  child: Image.memory(imgBytes),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.web),
+                    ),
+                    title: Text('浏览器'),
                     subtitle: TextField(controller: f),
                     trailing: IconButton(
                       onPressed: () async {
-                        final browser = InternalBrowser();
-                        final settings = InAppBrowserClassSettings(
-                          browserSettings: InAppBrowserSettings(),
-                          webViewSettings: InAppWebViewSettings(),
-                        );
-                        await browser.openUrlRequest(
-                          urlRequest: URLRequest(url: WebUri(f.text)),
-                          settings: settings,
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => H5Page(url: f.text),
+                          ),
                         );
                       },
                       icon: Icon(Icons.near_me),

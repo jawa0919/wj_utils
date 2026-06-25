@@ -33,6 +33,13 @@ class _URLSchemesPageState extends State<URLSchemesPage> {
           context: context,
           tiles: [
             TextButton(
+              child: const Text('高德地图'),
+              onPressed: () {
+                Uri uri = Uri.parse('iosamap://');
+                _open(context, uri);
+              },
+            ),
+            TextButton(
               child: const Text('百度地图'),
               onPressed: () {
                 Uri uri = Uri.parse('baidumap://');
@@ -71,13 +78,6 @@ class _URLSchemesPageState extends State<URLSchemesPage> {
               child: const Text('抖音'),
               onPressed: () {
                 Uri uri = Uri.parse('awemesso://');
-                _open(context, uri);
-              },
-            ),
-            TextButton(
-              child: const Text('高德地图'),
-              onPressed: () {
-                Uri uri = Uri.parse('iosamap://');
                 _open(context, uri);
               },
             ),
