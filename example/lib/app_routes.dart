@@ -114,6 +114,27 @@ class RouteErrorPage extends StatelessWidget {
 class H5Routes {
   H5Routes._();
 
+  /// 格式化H5链接
+  static String formateH5Url(String path, [bool h5 = true, bool token = true]) {
+    Uri uri = Uri.parse(path);
+    debugPrint('h5_urls.dart~uri: $uri');
+    if (h5) {
+      uri = Uri.parse(ServerStore.to.h5Host + path);
+      debugPrint('h5_urls.dart~h5HostUri: $uri');
+    }
+    if (token) {
+      uri = uri.replace(
+        queryParameters: {
+          ...uri.queryParameters,
+          'appToken': UserStore.to.token,
+        },
+      );
+    }
+    String url = uri.toString();
+    debugPrint('h5_urls.dart~formateH5Url: $url');
+    return url;
+  }
+
   // static Future<T?> push<T>(String url) {
   //   return AppRoutes.push(H5Page.routeName, {'url': url});
   // }

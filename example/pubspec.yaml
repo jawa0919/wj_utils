@@ -10,9 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  ##############################################################################
   flutter_localizations:
     sdk: flutter
-  ##############################################################################
   package_info_plus: ^10.1.0
   device_info_plus: ^13.1.0
   connectivity_plus: ^7.1.1
@@ -37,12 +37,16 @@ dependencies:
   flutter_keyboard_visibility: ^6.0.0
   flutter_screenutil: ^5.9.3
   flutter_smart_dialog: ^5.1.0
-  flutter_scankit: ^2.0.6
+  flutter_zxing: ^2.3.0
+  archive: ^4.0.9
+  shelf: ">=1.0.0 <2.0.0"
+  shelf_static: ">=1.0.0 <2.0.0"
   ##############################################################################
   ##############################################################################
   wj_utils:
     git:
       url: https://github.com/jawa0919/wj_utils.git
+  ##############################################################################
 
 dependency_overrides:
   wj_utils:

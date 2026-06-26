@@ -1,12 +1,9 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import 'package:dio_log_plus/dio_log_plus.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../h5/h5_page.dart';
-import '../util/ex_object.dart';
 import '../util/global_util.dart';
 import '../util/media_util.dart';
 import '../view/qr_scan_view.dart';
@@ -31,6 +28,8 @@ class DebugPage extends StatefulWidget {
 }
 
 class _DebugPageState extends State<DebugPage> {
+  var f = TextEditingController(text: 'https://flutter.cn/');
+
   @override
   void initState() {
     super.initState();
@@ -41,7 +40,6 @@ class _DebugPageState extends State<DebugPage> {
     super.dispose();
   }
 
-  var f = TextEditingController(text: 'https://flutter.cn/');
   @override
   Widget build(BuildContext context) {
     showDebugBtn(context);
@@ -128,40 +126,41 @@ class _DebugPageState extends State<DebugPage> {
                       },
                       onLongPress: () {
                         final imgBytes = QrScanView.qrPng(f.text);
-                        showDialog(
+                        showModalBottomSheet(
                           context: context,
-                          builder: (context) => LayoutBuilder(
-                            builder: (context, constraints) {
-                              final maxWidth = constraints.maxWidth;
-                              final maxHeight = constraints.maxHeight;
-                              final sideLength = math.min(
-                                math.min(maxWidth, maxHeight),
-                                math.max(maxWidth, maxHeight) / 2,
-                              );
-                              return SizedBox(
-                                width: sideLength,
-                                height: sideLength,
-                                child: InkWell(
-                                  onLongPressUp: () async {
-                                    await MediaUtil.saveImageBytesToPhotosAlbum(
-                                      imgBytes,
-                                      'qr_code_${DateTime.now().str}.png',
-                                    ).then((value) {
-                                      if (value.isSuccess) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text('save success'),
+                          builder: (context) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Image.memory(imgBytes),
+                              ElevatedButton(
+                                child: const Text('保存'),
+                                onPressed: () async {
+                                  await MediaUtil.saveImageBytesToPhotosAlbum(
+                                    imgBytes,
+                                    'qr_code_${DateTime.now().toString()}.png',
+                                  ).then((value) {
+                                    if (value.isSuccess) {
+                                      Navigator.of(context).pop();
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(content: Text('save success')),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'save failed ${value.errorMessage}',
                                           ),
-                                        );
-                                      }
-                                    });
-                                  },
-                                  child: Image.memory(imgBytes),
-                                ),
-                              );
-                            },
+                                        ),
+                                      );
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                         );
                       },

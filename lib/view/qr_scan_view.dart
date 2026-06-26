@@ -100,6 +100,9 @@ class _QrScanViewState extends State<QrScanView> {
 
   void _onScanResult(Code result) async {
     debugPrint('_onScanResult :${result.text}');
+    final text = result.text?.trim() ?? '';
+    if (text.isEmpty) return;
+    Navigator.of(context).maybePop(text);
   }
 
   Widget _buildTips(BuildContext context) {
