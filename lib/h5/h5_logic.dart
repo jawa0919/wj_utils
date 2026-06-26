@@ -1,6 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -8,7 +9,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:signals/signals.dart';
 
+import '../store/theme_store.dart';
 import '../util/ex_object.dart';
+import '../util/global_util.dart';
 import '../util/media_util.dart';
 
 class H5Logic {
@@ -16,27 +19,31 @@ class H5Logic {
   static final H5Logic _instance = H5Logic._internal();
   factory H5Logic() => _instance;
   H5Logic._internal() {
-    debugPrint('dart.dart~onInit: ');
+    debugPrint('h5_logic.dart~onInit: ');
   }
 
-  late StreamSubscription<bool> keyboardSubscription;
-
-  void initState() {
+  void onPageCreated() {
     keyboardSubscription = KeyboardVisibilityController().onChange.listen(
-      appKeyboardVisibility,
+      appKeyboardVisibilityChange,
     );
   }
 
-  void onReady(BuildContext context) {
-    debugPrint('h5_logic.dart~onReady: ');
-    // LoadingPage.show(context);
+  void onPageMounted(BuildContext context) {
+    debugPrint('h5_logic.dart~onPageMounted: ');
+    attachmentContext = context;
   }
 
+  void onPageDestroyed() {
+    debugPrint('h5_logic.dart~onPageDestroyed: ');
+    keyboardSubscription.cancel();
+  }
+
+  late StreamSubscription<bool> keyboardSubscription;
   var initialUrl = signal('', debugLabel: 'initialUrl');
   late final initialUrlRequest = computed(
     () => URLRequest(url: WebUri(initialUrl.value)),
   );
-
+  BuildContext? attachmentContext;
   InAppWebViewController? webController;
   InAppWebViewSettings get initialSettings => InAppWebViewSettings(
     // cacheEnabled: false,
@@ -47,7 +54,7 @@ class H5Logic {
     allowsInlineMediaPlayback: true,
     iframeAllowFullscreen: true,
     upgradeKnownHostsToHTTPS: false,
-    // applicationNameForUserAgent: AppStorage.appUserAgent,
+    applicationNameForUserAgent: GlobalUtil.appUserAgent,
     // allowsBackForwardNavigationGestures: false,
     // useOnDownloadStart: true,
   );
@@ -58,91 +65,63 @@ class H5Logic {
   /// 状态normal/loading/error
   var status = signal('normal');
 
-  /// 屏幕信息
-  // var isDarkMode = signal(false);
-  // var devicePixelRatio = signal(0.0);
-  // var mediaQuerySize = signal(Size.zero);
-  // var mediaQueryPadding = signal(EdgeInsets.zero);
-  // var isLandscape = signal(false);
+  /// 状态栏是否隐藏
   var isFullScreen = signal(true);
 
-  void onClose() {
-    debugPrint('h5_logic.dart~onClose: ');
-    keyboardSubscription.cancel();
+  Map<String, dynamic Function(List<dynamic> arguments)> handlers = {};
+  void setupHandler(
+    String api,
+    dynamic Function(List<dynamic> arguments) callback,
+  ) {
+    handlers[api] = callback;
+    webController?.addJavaScriptHandler(handlerName: api, callback: callback);
   }
 
   void addHandler() {
     debugPrint('h5_logic.dart~addHandler: ');
+    handlers.forEach((key, value) {
+      webController?.addJavaScriptHandler(handlerName: key, callback: value);
+    });
     webController?.addJavaScriptHandler(
-      handlerName: 'userLogout',
+      handlerName: 'exitApp',
       callback: (List<dynamic> arguments) async {
         EasyDebounce.debounce(
-          'logout-debounce',
+          'exitApp-debounce',
           const Duration(milliseconds: 200),
-          () => handleLogout(arguments),
+          () => exit(0),
         );
-        return true;
-      },
-    );
-    webController?.addJavaScriptHandler(
-      handlerName: 'webUpdateToken',
-      callback: (List<dynamic> arguments) async {
-        String token = ListDynamic.val(arguments, 0) ?? '';
-        if (token.isEmpty) return false;
-        // await UserStore.to.saveToken(token);
         return true;
       },
     );
     webController?.addJavaScriptHandler(
       handlerName: 'closeWindow',
       callback: (List<dynamic> arguments) {
-        // AppRoutes.popOrExit();
+        if (attachmentContext != null) {
+          Navigator.pop(attachmentContext!);
+        }
+      },
+    );
+    webController?.addJavaScriptHandler(
+      handlerName: 'clearAllCache',
+      callback: (List<dynamic> arguments) {
+        InAppWebViewController.clearAllCache();
+      },
+    );
+    webController?.addJavaScriptHandler(
+      handlerName: 'toggleFullScreen',
+      callback: (List<dynamic> arguments) {
+        isFullScreen.value = !isFullScreen.value;
+        return appScreenInfoChange();
       },
     );
     webController?.addJavaScriptHandler(
       handlerName: 'appScreenInfo',
       callback: (List<dynamic> arguments) {
-        var screenInfo = {
-          // 'isDark': ThemeStore.to.isDark.value,
-          // 'displayWidth': AppStorage.displayWidth,
-          // 'displayHeight': AppStorage.displayHeight,
-          // 'windowWidth': AppStorage.windowWidth,
-          // 'windowHeight': AppStorage.windowHeight,
-          // 'devicePixelRatio': AppStorage.devicePixelRatio,
-          // 'viewPaddingRight': AppStorage.viewPaddingRight,
-          // 'viewPaddingTop': AppStorage.viewPaddingTop,
-          // 'viewPaddingLeft': AppStorage.viewPaddingLeft,
-          // 'viewPaddingBottom': AppStorage.viewPaddingBottom,
-          'isFullScreen': isFullScreen.value,
-        };
-        debugPrint('screenInfo: $screenInfo');
-        return screenInfo;
+        return appScreenInfoChange();
       },
     );
     webController?.addJavaScriptHandler(
-      handlerName: 'setFullScreen',
-      callback: (List<dynamic> arguments) {
-        var val = ListDynamic.val<bool>(arguments, 0) ?? false;
-        isFullScreen.value = val;
-        if (val) {
-          appScreenInfoChange({
-            // 'isDark': ThemeStore.to.isDark.value,
-            // 'displayWidth': AppStorage.displayWidth,
-            // 'displayHeight': AppStorage.displayHeight,
-            // 'windowWidth': AppStorage.windowWidth,
-            // 'windowHeight': AppStorage.windowHeight,
-            // 'devicePixelRatio': AppStorage.devicePixelRatio,
-            // 'viewPaddingRight': AppStorage.viewPaddingRight,
-            // 'viewPaddingTop': AppStorage.viewPaddingTop,
-            // 'viewPaddingLeft': AppStorage.viewPaddingLeft,
-            // 'viewPaddingBottom': AppStorage.viewPaddingBottom,
-            // 'isFullScreen': isFullScreen.value,
-          });
-        }
-      },
-    );
-    webController?.addJavaScriptHandler(
-      handlerName: 'clearWebCache',
+      handlerName: 'clearAllCache',
       callback: (List<dynamic> arguments) {
         InAppWebViewController.clearAllCache();
       },
@@ -169,10 +148,10 @@ class H5Logic {
       handlerName: 'chooseAlbumImage',
       callback: (List<dynamic> arguments) async {
         var img = await ImagePicker().pickImage(source: ImageSource.gallery);
-        if (img == null) return null;
-        debugPrint('chooseAlbumImage: ${img.path}');
-        debugPrint('chooseAlbumImage: ${img.name}');
-        String fileType = img.name.split('.').last.toLowerCase();
+        if (img == null) {
+          return {'path': '', 'name': '', 'bytes': [], 'length': 0};
+        }
+        var fileType = img.name.split('.').last.toLowerCase();
         return {
           'path': img.path,
           'name': img.name,
@@ -185,26 +164,47 @@ class H5Logic {
   }
 
   void appTokenChange(String token) {
-    dispatchEvent('appTokenChange', {'token': token});
+    _dispatchCustomEvent('appTokenChange', {'token': token});
   }
 
-  void appScreenInfoChange(Map<String, dynamic> json) {
-    dispatchEvent('appScreenInfoChange', json);
+  Map<String, dynamic> appScreenInfoChange() {
+    var screenInfo = {
+      'isDark': ThemeStore.to.isDark.value,
+      'displayHeight': GlobalUtil.displayHeight,
+      'windowWidth': GlobalUtil.windowWidth,
+      'windowHeight': GlobalUtil.windowHeight,
+      'devicePixelRatio': GlobalUtil.devicePixelRatio,
+      'viewPaddingRight': GlobalUtil.viewPaddingRight,
+      'viewPaddingTop': GlobalUtil.viewPaddingTop,
+      'viewPaddingLeft': GlobalUtil.viewPaddingLeft,
+      'viewPaddingBottom': GlobalUtil.viewPaddingBottom,
+      'isFullScreen': isFullScreen.value,
+    };
+    _dispatchCustomEvent('appScreenInfoChange', screenInfo);
+    return screenInfo;
   }
 
-  void appKeyboardVisibility(bool visible) {
-    dispatchEvent('appKeyboardVisibility', {'visible': visible});
+  void appKeyboardVisibilityChange(bool visible) {
+    _dispatchCustomEvent('appKeyboardVisibilityChange', {'visible': visible});
   }
 
-  void handleLogout(List<dynamic> arguments) async {
-    String tips = ListDynamic.val(arguments, 0) ?? '';
-    // UserStore.to.onLogout(removeProfile: true, toLoginPage: true, tips: tips);
-  }
-
-  void dispatchEvent(String type, Map<String, dynamic> detail) {
+  ///
+  /// 发送自定义事件
+  ///
+  /// [param api] 事件名称
+  /// [param detail] 事件详情
+  ///
+  /// 监听自定义事件-ts代码
+  ///
+  /// ```ts
+  /// window.addEventListener(api, (event: Event) => {
+  ///      var customEvent = event as CustomEvent<Record<string, any>>;
+  ///      var detail: Record<string, any> = customEvent.detail;
+  /// }, false);
+  /// ```
+  void _dispatchCustomEvent(String api, Map<String, dynamic> detail) {
     var map = {'detail': detail};
-    var script = "window.dispatchEvent(new CustomEvent('$type', $map))";
-    debugPrint('h5_logic.dart~dispatchEvent: \n$script');
+    var script = "window.dispatchEvent(new CustomEvent('$api', $map))";
     webController?.evaluateJavascript(source: script);
   }
 }

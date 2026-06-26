@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:signals/signals.dart';
+import 'package:wj_utils/h5/h5_logic.dart';
 
 import '../api/user_api.dart';
 import '../app_import.dart';
@@ -34,6 +35,14 @@ class UserStore {
     final profileJson = GlobalUtil.pref.getString('profile') ?? '{}';
     _profile.value = LoginUserResp.fromJson(jsonDecode(profileJson));
     lastLoginUser.value = GlobalUtil.pref.getString('lastLoginUser') ?? '';
+    H5Logic().setupHandler('userLogout', (arguments) async {
+      String tips = ListDynamic.val(arguments, 0) ?? '';
+      offAndToLoginPage(tips);
+    });
+    H5Logic().setupHandler('webUpdateToken', (arguments) async {
+      String newVal = ListDynamic.val(arguments, 0) ?? '';
+      await saveToken(newVal);
+    });
   }
 
   Future<void> saveToken(String val, [bool updateProfile = true]) async {

@@ -11,6 +11,13 @@ class H5Page extends StatefulWidget {
   final String url;
   const H5Page({super.key, required this.url});
 
+  static Future<T?> start<T>(BuildContext context, String url) async {
+    return await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => H5Page(url: url)),
+    );
+  }
+
   @override
   State<H5Page> createState() => _H5PageState();
 }
@@ -24,19 +31,19 @@ class _H5PageState extends State<H5Page>
   @override
   void initState() {
     super.initState();
-    logic.initState();
+    logic.onPageCreated();
     debugPrint('h5_page.dart~initState: ${widget.url}');
     logic.initialUrl.value = widget.url;
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      logic.onReady(context);
+      logic.onPageMounted(context);
     });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    logic.onClose();
+    logic.onPageDestroyed();
     super.dispose();
   }
 

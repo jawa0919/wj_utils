@@ -87,7 +87,7 @@
         <p>
             <button onclick="refreshInfo()">刷新信息</button>
             <button onclick="closeWindow()">关闭</button>
-            <button onclick="userLogout()">安全退出</button>
+            <button onclick="exitApp()">安全退出应用</button>
         </p>
         <div class="info-section">
             <div class="info-title">当前页面URL:</div>
@@ -100,6 +100,7 @@
         <div class="info-section">
             <div class="info-title">User Token:</div>
             <div id="user-token" class="info-content"></div>
+            <button onclick="userLogout()">安全退出</button>
             <button onclick="webUpdateToken()">从web端更新Token</button>
         </div>
         <div class="info-section">
@@ -185,6 +186,10 @@
             if (!isFlutterInAppWebViewReady) return;
             window['flutter_inappwebview'].callHandler('closeWindow')
         }
+        function exitApp() {
+            if (!isFlutterInAppWebViewReady) return;
+            window['flutter_inappwebview'].callHandler('exitApp')
+        }
         function userLogout() {
             if (!isFlutterInAppWebViewReady) return;
             window['flutter_inappwebview'].callHandler('userLogout', "pls")
@@ -195,8 +200,10 @@
         }
         function getAppToken() {
             var userToken = "";
-            var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('appToken')) userToken = urlParams.get('appToken');
+            var usp = new URLSearchParams(window.location.search);
+            if (usp.has('tk')) userToken = usp.get('tk');
+            if (usp.has('token')) userToken = usp.get('token');
+            if (usp.has('appToken')) userToken = usp.get('appToken');
             document.getElementById('user-token').textContent = userToken;
             window.addEventListener('appTokenChange', function (token) {
                 var info = event.detail;
@@ -240,7 +247,7 @@
         }
         function setFullScreen() {
             if (!isFlutterInAppWebViewReady) return;
-            window['flutter_inappwebview'].callHandler('setFullScreen', true)
+            window['flutter_inappwebview'].callHandler('toggleFullScreen');
         }
         function saveNetImageToPhotosAlbum() {
             if (!isFlutterInAppWebViewReady) return;
@@ -248,7 +255,12 @@
             var name = "logo_" + Date.now() + ".png";
             window['flutter_inappwebview'].callHandler('saveNetImageToPhotosAlbum', url, name).then(function (result) {
                 console.log('debug.html~saveNetImageToPhotosAlbum', JSON.stringify(result));
-                window.alert('保存图片成功');
+                var isSuccess = result.isSuccess;
+                if (isSuccess) {
+                    window.alert('保存图片成功');
+                } else {
+                    window.alert('保存图片失败' + result.errorMessage);
+                }
             });
         }
         function saveNetMediaToPhotosAlbum() {
@@ -257,7 +269,12 @@
             var name = "mov_bbb_" + Date.now() + ".mp4";
             window['flutter_inappwebview'].callHandler('saveNetMediaToPhotosAlbum', url, name).then(function (result) {
                 console.log('debug.html~saveNetMediaToPhotosAlbum', JSON.stringify(result));
-                window.alert('保存媒体成功');
+                var isSuccess = result.isSuccess;
+                if (isSuccess) {
+                    window.alert('保存媒体成功');
+                } else {
+                    window.alert('保存媒体失败' + result.errorMessage);
+                }
             });
         }
         function chooseAlbumImage() {
@@ -338,9 +355,9 @@
         }
         function setInputFocus() {
             document.getElementById('focus-test').focus();
-            window.addEventListener('appKeyboardVisibility', function (event) {
+            window.addEventListener('appKeyboardVisibilityChange', function (event) {
                 event.preventDefault();
-                console.log('debug.html~appKeyboardVisibility' + event.detail.visible);
+                console.log('debug.html~appKeyboardVisibilityChange' + event.detail.visible);
             });
         }
         function inputOnfocus() {
