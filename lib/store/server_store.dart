@@ -9,14 +9,14 @@ class ServerStore {
   static ServerStore get instance => _instance;
   static ServerStore get to => _instance;
 
-  late List<Map<String, dynamic>> serverInfoList;
-  static void init(List<Map<String, dynamic>> serverInfoList) =>
-      _instance._internal(serverInfoList);
+  late List<Map<String, dynamic>> serverList;
+  static void init(List<Map<String, dynamic>> serverList, String defaultMode) =>
+      _instance._internal(serverList, defaultMode);
 
-  void _internal(List<Map<String, dynamic>> serverInfoList) {
-    this.serverInfoList = serverInfoList;
-    debugPrint('server_store.dart~_internal: ');
-    _serverEnv.value = GlobalUtil.pref.getString('_serverEnv') ?? 'prod';
+  void _internal(List<Map<String, dynamic>> serverList, String defaultMode) {
+    this.serverList = serverList;
+    debugPrint('server_store.dart~_internal: $defaultMode');
+    _serverEnv.value = GlobalUtil.pref.getString('_serverEnv') ?? defaultMode;
     if (_serverEnv.value == 'custom') {
       _serverInfo = {
         'env': 'custom',
@@ -24,7 +24,7 @@ class ServerStore {
         'h5Host': GlobalUtil.pref.getString('custom_h5Host'),
       };
     } else {
-      _serverInfo = this.serverInfoList.firstWhere(
+      _serverInfo = this.serverList.firstWhere(
         (element) => element['env'] == _serverEnv.value,
       );
     }
@@ -51,5 +51,11 @@ class ServerStore {
       await GlobalUtil.pref.setString('custom_apiHost', val['apiHost']);
       await GlobalUtil.pref.setString('custom_h5Host', val['h5Host']);
     }
+    serverEnvChangeListener?.call();
+  }
+
+  static void Function()? serverEnvChangeListener;
+  static void addServerEnvChangeListener(void Function() listener) {
+    serverEnvChangeListener = listener;
   }
 }

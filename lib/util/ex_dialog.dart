@@ -29,6 +29,10 @@ class ExDialog {
     SmartDialog.showLoading(msg: message);
   }
 
+  static Future<void> dismissLoading() async {
+    await SmartDialog.dismiss(status: SmartStatus.loading);
+  }
+
   static Future<String?> showDialog(
     Widget child, {
     String? title,

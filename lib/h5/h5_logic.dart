@@ -33,7 +33,7 @@ class H5Logic {
     attachmentContext = context;
   }
 
-  void onPageDestroyed() {
+  void onPageDestroyed(BuildContext context) {
     debugPrint('h5_logic.dart~onPageDestroyed: ');
     keyboardSubscription.cancel();
   }

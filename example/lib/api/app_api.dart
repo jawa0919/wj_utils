@@ -4,7 +4,8 @@ import 'package:dio/dio.dart';
 
 import '../app_import.dart';
 
-export 'package:dio/dio.dart' show Options;
+part '_common_api.dart';
+part '_user_api.dart';
 
 class AppApi {
   static final AppApi _instance = AppApi._internal();
@@ -46,7 +47,7 @@ class AppApi {
     return response.data;
   }
 
-  Future post(
+  Future<T?> post<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
@@ -60,7 +61,7 @@ class AppApi {
       'autoToken': autoToken,
       'codeErrorToast': codeErrorToast,
     });
-    var response = await dio.post(
+    var response = await dio.post<T>(
       path,
       data: data,
       queryParameters: queryParameters,
@@ -69,7 +70,7 @@ class AppApi {
     return response.data;
   }
 
-  Future put(
+  Future<T?> put<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
@@ -83,7 +84,7 @@ class AppApi {
       'autoToken': autoToken,
       'codeErrorToast': codeErrorToast,
     });
-    var response = await dio.put(
+    var response = await dio.put<T>(
       path,
       data: data,
       queryParameters: queryParameters,
@@ -92,7 +93,7 @@ class AppApi {
     return response.data;
   }
 
-  Future patch(
+  Future<T?> patch<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
@@ -106,7 +107,7 @@ class AppApi {
       'autoToken': autoToken,
       'codeErrorToast': codeErrorToast,
     });
-    var response = await dio.patch(
+    var response = await dio.patch<T>(
       path,
       data: data,
       queryParameters: queryParameters,
@@ -115,7 +116,7 @@ class AppApi {
     return response.data;
   }
 
-  Future delete(
+  Future<T?> delete<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
@@ -129,7 +130,7 @@ class AppApi {
       'autoToken': autoToken,
       'codeErrorToast': codeErrorToast,
     });
-    var response = await dio.delete(
+    var response = await dio.delete<T>(
       path,
       data: data,
       queryParameters: queryParameters,
@@ -138,7 +139,7 @@ class AppApi {
     return response.data;
   }
 
-  Future head(
+  Future<T?> head<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
@@ -152,7 +153,7 @@ class AppApi {
       'autoToken': autoToken,
       'codeErrorToast': codeErrorToast,
     });
-    var response = await dio.head(
+    var response = await dio.head<T>(
       path,
       data: data,
       queryParameters: queryParameters,
@@ -237,10 +238,31 @@ class SimpleResponse<T> {
     'data': data,
   };
 
-  bool get success => code == 200;
-
   @override
   String toString() {
     return 'SimpleResponse{code: $code, message: $message, data: $data}';
+  }
+
+  bool get success => code == SUCCESS_CODE;
+  // ignore: constant_identifier_names
+  static const SUCCESS_CODE = 200;
+
+  const SimpleResponse.success(
+    this.data, {
+    this.message = 'success',
+    this.code = SUCCESS_CODE,
+  });
+
+  static const isUseMock = !bool.fromEnvironment('dart.vm.product') && true;
+  static Future<SimpleResponse<T>> withMock<T>(
+    T? data,
+    Future<SimpleResponse<T>> Function() realRequest,
+  ) async {
+    if (!isUseMock) return await realRequest();
+    debugPrint('withMockSuccess: --------------------------------------------');
+    debugPrint('withMockSuccess: $data');
+    debugPrint('withMockSuccess: --------------------------------------------');
+    await Future.delayed(const Duration(seconds: 1));
+    return SimpleResponse.success(data);
   }
 }

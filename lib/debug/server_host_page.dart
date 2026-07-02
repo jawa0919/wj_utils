@@ -28,7 +28,7 @@ class ServerHostPage extends StatelessWidget {
                   padding: EdgeInsets.only(top: 20),
                   child: Text('服务器设置', style: TextStyle(fontSize: 16)),
                 ),
-                ...ServerStore.to.serverInfoList.map(
+                ...ServerStore.to.serverList.map(
                   (e) => _buildServer(context, e),
                 ),
               ],

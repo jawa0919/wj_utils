@@ -43,7 +43,7 @@ class _H5PageState extends State<H5Page>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    logic.onPageDestroyed();
+    logic.onPageDestroyed(context);
     super.dispose();
   }
 

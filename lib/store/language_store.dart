@@ -30,13 +30,15 @@ class LanguageStore {
   late Map<Locale, Map<String, String>> _languageMap;
   late List<Locale> supportedLocales;
   late Map<Locale, String> supportedLanguageNames;
-  static void init(Map<Locale, Map<String, String>> languageMap) =>
+  static void init([Map<Locale, Map<String, String>> languageMap = const {}]) =>
       _instance._internal(languageMap);
 
   void _internal(Map<Locale, Map<String, String>> languageMap) {
     _languageMap = {
       const Locale('zh', 'CN'): {'language.name': '简体中文'},
       const Locale('en', 'US'): {'language.name': 'English'},
+      const Locale('es', 'ES'): {'language.name': 'Español'},
+      const Locale('pt', 'PT'): {'language.name': 'Português'},
       const Locale('ja', 'JP'): {'language.name': '日本語'},
       const Locale('ko', 'KR'): {'language.name': '한국어'},
     };

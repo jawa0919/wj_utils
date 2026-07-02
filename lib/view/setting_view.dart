@@ -320,6 +320,56 @@ extension SettingViewLanguage on SettingView {
 
       'SettingView.退出登录': 'Logout',
     },
+    const Locale('es', 'ES'): {
+      'SettingView.设置': 'Ajustes',
+
+      'SettingView.系统设置': 'Configuración del sistema',
+      'SettingView.主题模式': 'Modo de tema',
+      'SettingView.跟随系统': 'Seguir al sistema',
+      'SettingView.浅色主题': 'Tema claro',
+      'SettingView.深色主题': 'Tema oscuro',
+      'SettingView.选择主题': 'Seleccionar tema',
+      'SettingView.语言': 'Idioma',
+      'SettingView.选择语言': 'Seleccionar idioma',
+
+      'SettingView.账户设置': 'Configuración de la cuenta',
+      'SettingView.账号管理': 'Gestión de cuentas',
+      'SettingView.应用权限': 'Permisos de la aplicación',
+
+      'SettingView.关于应用': 'Acerca de la aplicación',
+      'SettingView.检查更新': 'Buscar actualizaciones',
+      'SettingView.正在检查更新': 'Buscando actualizaciones...',
+      'SettingView.已经是最新版本了': 'Ya está en la última versión',
+      'SettingView.服务协议': 'Términos de servicio',
+      'SettingView.关于': 'Acerca de',
+
+      'SettingView.退出登录': 'Cerrar sesión',
+    },
+    const Locale('pt', 'PT'): {
+      'SettingView.设置': 'Definições',
+
+      'SettingView.系统设置': 'Definições do sistema',
+      'SettingView.主题模式': 'Modo de tema',
+      'SettingView.跟随系统': 'Seguir o sistema',
+      'SettingView.浅色主题': 'Tema claro',
+      'SettingView.深色主题': 'Tema escuro',
+      'SettingView.选择主题': 'Selecionar tema',
+      'SettingView.语言': 'Idioma',
+      'SettingView.选择语言': 'Selecionar idioma',
+
+      'SettingView.账户设置': 'Definições da conta',
+      'SettingView.账号管理': 'Gestão de contas',
+      'SettingView.应用权限': 'Permissões da aplicação',
+
+      'SettingView.关于应用': 'Sobre a aplicação',
+      'SettingView.检查更新': 'Verificar atualizações',
+      'SettingView.正在检查更新': 'A verificar atualizações...',
+      'SettingView.已经是最新版本了': 'Já está na versão mais recente',
+      'SettingView.服务协议': 'Termos de serviço',
+      'SettingView.关于': 'Sobre',
+
+      'SettingView.退出登录': 'Terminar sessão',
+    },
     const Locale('ja', 'JP'): {
       'SettingView.设置': '設定',
 

@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+import 'api/app_api.dart';
 import 'app.dart';
 import 'app_import.dart';
+import 'h5_routes.dart';
 
 void main() async {
   debugPrint('main.dart~running: isProduct-${GlobalUtil.isProduct}');
@@ -21,10 +23,14 @@ void main() async {
 }
 
 Future<void> _initSystem() async {
-  ServerStore.init(AppConst.serverInfoList);
+  ServerStore.init(AppConst.serverList, GlobalUtil.isProduct ? 'prod' : 'dev');
+  ServerStore.addServerEnvChangeListener(() {
+    AppApi().updateBaseUrl(ServerStore.to.apiHost);
+  });
   ThemeStore.init(AppTheme.colorScheme);
-  LanguageStore.init({});
+  LanguageStore.init();
   AppRoutes.setPageLanguage();
+  H5Routes.initOffline(ServerStore.to.env);
   if (!GlobalUtil.isWeb) {
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     List<DeviceOrientation> devOri = [DeviceOrientation.portraitUp];
@@ -34,7 +40,9 @@ Future<void> _initSystem() async {
 
 Future<void> _printDebugMessage() async {
   if (Platform.isAndroid) {
-    await InAppWebViewController.setWebContentsDebuggingEnabled(true);
+    await InAppWebViewController.setWebContentsDebuggingEnabled(
+      !GlobalUtil.isProduct,
+    );
   }
   if (!GlobalUtil.isProduct) {
     debugPrint('..._printDebugMessage...');
@@ -49,6 +57,5 @@ Future<void> _printDebugMessage() async {
     debugPrint('packageName: ${GlobalUtil.appId}');
     debugPrint('buildVersion: ${GlobalUtil.buildVersion}');
     debugPrint('buildNumber: ${GlobalUtil.buildNumber}');
-    debugPrint('buildSignature: ${GlobalUtil.buildSignature}');
   }
 }

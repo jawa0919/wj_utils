@@ -19,7 +19,7 @@ class AppConst {
   static const String copyrightCode = 'Copyright © 2006-2026 flutter.cn';
 
   /// 服务器列表
-  static const serverInfoList = [
+  static const serverList = [
     {
       'env': 'prod',
       'apiHost': 'https://flutter.cn',

@@ -1,10 +1,19 @@
-import 'app_api.dart';
+part of 'app_api.dart';
 
 /// 用户管理
 class UserApi {
   UserApi._();
 
   /// 发送验证码
+  static Future<SimpleResponse> sendCode(String phone) async {
+    var dataRes = await AppApi().post(
+      '/api/customer/sendCode',
+      data: {'phone': phone},
+      autoToken: false,
+    );
+    return SimpleResponse.fromJson(dataRes);
+  }
+
   /// 重置密码
 
   /// 用户注册
@@ -37,10 +46,36 @@ class UserApi {
   }
 
   /// 用户登录
-  static Future<SimpleResponse> login(String email, String password) async {
+  static Future<SimpleResponse> login(String username, String password) async {
     var dataRes = await AppApi().post(
       '/api/customer/login',
-      data: {'email': email, 'password': password},
+      data: {'username': username, 'password': password},
+      autoToken: false,
+    );
+    return SimpleResponse.fromJson(dataRes);
+  }
+
+  /// 用户登录-手机验证吗
+  static Future<SimpleResponse> loginPhoneCode(
+    String phone,
+    String code,
+  ) async {
+    var dataRes = await AppApi().post(
+      '/api/customer/login',
+      data: {'phone': phone, 'code': code},
+      autoToken: false,
+    );
+    return SimpleResponse.fromJson(dataRes);
+  }
+
+  /// 用户登录-邮箱验证吗
+  static Future<SimpleResponse> loginEmailCode(
+    String email,
+    String code,
+  ) async {
+    var dataRes = await AppApi().post(
+      '/api/customer/login',
+      data: {'email': email, 'code': code},
       autoToken: false,
     );
     return SimpleResponse.fromJson(dataRes);

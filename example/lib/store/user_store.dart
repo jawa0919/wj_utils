@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:signals/signals.dart';
 import 'package:wj_utils/h5/h5_logic.dart';
 
-import '../api/user_api.dart';
+import '../api/app_api.dart';
 import '../app_import.dart';
 import '../dto/login_user_resp.dart';
 import '../page/login/login_page.dart';
@@ -51,7 +51,10 @@ class UserStore {
       token = val;
     }
     if (updateProfile) {
-      var r = await UserApi.info();
+      var r = await SimpleResponse.withMock(
+        LoginUserResp().toJson(),
+        () => UserApi.info(),
+      );
       if (!r.success) return;
       final resp = LoginUserResp.fromJson(r.data);
       await saveProfile(resp);
@@ -94,7 +97,7 @@ class UserStore {
       'user_store.dart~onLogout: '
       'removeProfile: $removeProfile toLoginPage: $toLoginPage tips: $tips',
     );
-    await UserApi.logout();
+    await SimpleResponse.withMock({}, () => UserApi.logout());
     await clearToken();
     if (removeProfile) await clearProfile();
     if (toLoginPage) {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -22,9 +23,8 @@ class H5Offline {
 
   final int port;
   String _homePath = '';
-  HttpServer? _server;
-  String serverUrl = '';
   String _currentVersion = '';
+  HttpServer? _server;
 
   Future<void> _initPath() async {
     if (_homePath.isNotEmpty) return;
@@ -37,7 +37,51 @@ class H5Offline {
     final zipFile = File(zipPath);
     final bytes = zipFile.readAsBytesSync();
     final archive = ZipDecoder().decodeBytes(bytes);
-    await extractArchiveToDisk(archive, destDir);
+    for (var f in archive.files) {
+      debugPrint('h5_offline.dart~archive.files: ${f.name}');
+    }
+    final indexFile = archive.files
+        .where((f) => f.name == 'index.html')
+        .toList();
+    if (indexFile.isNotEmpty) {
+      await extractArchiveToDisk(archive, destDir);
+      return;
+    }
+    final dirEntries = archive.files.where((f) => f.isDirectory).where((f) {
+      var fileName = f.name;
+      if (fileName.startsWith('.')) {
+        fileName = fileName.substring(1);
+      }
+      if (fileName.startsWith('/')) {
+        fileName = fileName.substring(1);
+      }
+      if (fileName.endsWith('/')) {
+        fileName = fileName.substring(0, fileName.length - 1);
+      }
+      return !fileName.contains('/');
+    }).toList();
+    if (dirEntries.length == 1) {
+      final rootDirName = dirEntries.first.name;
+      for (final file in archive.files) {
+        String targetPath = file.name;
+        if (targetPath.startsWith(rootDirName)) {
+          targetPath = targetPath.substring(rootDirName.length);
+          if (targetPath.startsWith('/')) targetPath = targetPath.substring(1);
+        }
+        if (targetPath.isEmpty) continue;
+        final fullPath = '$destDir/$targetPath';
+        if (file.isDirectory) {
+          await Directory(fullPath).create(recursive: true);
+        } else {
+          final outFile = File(fullPath);
+          await outFile.create(recursive: true);
+          await outFile.writeAsBytes(file.content as List<int>);
+        }
+      }
+      return;
+    } else {
+      throw Exception('Invalid zip file. Please check the format.');
+    }
   }
 
   Future<String> _readVersionFile(String dirPath) async {
@@ -51,6 +95,10 @@ class H5Offline {
     await file.writeAsString(version);
   }
 
+  bool isRunning() {
+    return _server != null;
+  }
+
   Future<String> getCurrentVersion() async {
     if (_currentVersion.isNotEmpty) return _currentVersion;
     await _initPath();
@@ -61,21 +109,18 @@ class H5Offline {
     return _currentVersion;
   }
 
-  Future<String> getPendingVersion() async {
+  Future<String> getNextVersion() async {
     await _initPath();
     final nextDir = Directory(p.join(_homePath, 'next'));
-    if (!await nextDir.exists()) return '';
-    return await _readVersionFile(nextDir.path);
+    if (await nextDir.exists()) {
+      return await _readVersionFile(nextDir.path);
+    }
+    return '';
   }
 
-  Future<bool> hasDeployment() async {
-    await _initPath();
-    return await Directory(p.join(_homePath, 'current')).exists();
-  }
-
-  Future<bool> hasPendingUpdate() async {
-    await _initPath();
-    return await Directory(p.join(_homePath, 'next')).exists();
+  final _nextVersionReadyController = StreamController<String>.broadcast();
+  void onNextVersionReadyListener(void Function(String version) callback) {
+    _nextVersionReadyController.stream.listen(callback);
   }
 
   Future<String> startServer() async {
@@ -103,8 +148,8 @@ class H5Offline {
     _currentVersion = await _readVersionFile(currentDir.path);
   }
 
-  Future<bool> updateDist(String zipPath, String tag) async {
-    debugPrint('h5_offline.dart~updateDist: $zipPath $tag');
+  Future<bool> releaseNextDist(String zipPath, String version) async {
+    debugPrint('h5_offline.dart~releaseNextDist: $zipPath $version');
     await _initPath();
     final nextDir = Directory(p.join(_homePath, 'next'));
     if (await nextDir.exists()) {
@@ -119,7 +164,8 @@ class H5Offline {
       throw Exception('ZIP does not contain index.html');
     }
 
-    await _writeVersionFile(nextDir.path, tag);
+    await _writeVersionFile(nextDir.path, version);
+    _nextVersionReadyController.add(version);
     return true;
   }
 
@@ -127,13 +173,32 @@ class H5Offline {
     if (_server != null) {
       await _server!.close(force: true);
       _server = null;
-      serverUrl = '';
+      serverUrl.value = '';
+      _nextVersionReadyController.close();
     }
   }
 
   Future<String> restartServer() async {
     await stopServer();
     return await startServer();
+  }
+
+  final serverUrl = ValueNotifier<String>('');
+  Future<void> waitForServerUrl() async {
+    final completer = Completer<void>();
+    void listener() {
+      if (serverUrl.value.isNotEmpty && !completer.isCompleted) {
+        completer.complete();
+      }
+    }
+
+    serverUrl.addListener(listener);
+    try {
+      listener();
+      await completer.future;
+    } finally {
+      serverUrl.removeListener(listener);
+    }
   }
 
   Future<String> serveDist(String distPath) async {
@@ -158,7 +223,8 @@ class H5Offline {
       return response;
     });
     _server = await serve(handler, InternetAddress.anyIPv4, port);
-    serverUrl = 'http://${_server?.address.host}:${_server?.port}';
-    return serverUrl;
+    serverUrl.value = 'http://${_server?.address.host}:${_server?.port}';
+    debugPrint('h5_offline.dart~serverUrl: ${serverUrl.value}');
+    return serverUrl.value;
   }
 }
